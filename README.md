@@ -25,9 +25,10 @@ Fast, responsive, and deployable without a database or build process.
 
 ```text
 .
-|-- worker.js   Cloudflare Worker and local Node server
-|-- README.md   Project documentation
-|-- LICENSE     GNU Affero General Public License v3
+|-- worker.js    Cloudflare Worker and local Node server
+|-- README.md    Project documentation
+|-- vercel.json  Vercel Deployment & Route Handling 
+|-- LICENSE      GNU Affero General Public License v3
 ```
 
 ## Web Usage
@@ -45,7 +46,7 @@ Click **Generate QR**. The payment page displays the QR code and a button to ope
 Generated links use one encoded `ds` query parameter instead of exposing `pa`, `pn`, and `am` directly:
 
 ```text
-https://your-domain.example/pay?ds=ENCODED_PAYMENT_DATA
+https://ds-upi-qr-generator.vercel.app/pay?ds=ENCODED_PAYMENT_DATA
 ```
 
 The Worker decodes the token when the URL is opened. Generated public links use `ds`.
@@ -57,7 +58,7 @@ The Worker decodes the token when the URL is opened. Generated public links use 
 ### Endpoint
 
 ```http
-GET https://your-domain.example/api/qr
+GET https://ds-upi-qr-generator.vercel.app/api/qr
 ```
 
 ### Query Parameters
@@ -71,20 +72,20 @@ GET https://your-domain.example/api/qr
 ### Example Request
 
 ```text
-https://your-domain.example/api/qr?pa=sanchit%40ybl&pn=Sanchit&am=250
+https://ds-upi-qr-generator.vercel.app/api/qr?pa=sanchit%40ybl&pn=Sanchit&am=250
 ```
 
 PowerShell:
 
 ```powershell
-Invoke-RestMethod "https://your-domain.example/api/qr?pa=sanchit%40ybl&pn=Sanchit&am=250"
+Invoke-RestMethod "https://ds-upi-qr-generator.vercel.app/api/qr?pa=sanchit%40ybl&pn=Sanchit&am=250"
 ```
 
 JavaScript:
 
 ```javascript
 const response = await fetch(
-  "https://your-domain.example/api/qr?pa=sanchit%40ybl&pn=Sanchit&am=250",
+  "https://ds-upi-qr-generator.vercel.app/api/qr?pa=sanchit%40ybl&pn=Sanchit&am=250",
 );
 const payment = await response.json();
 console.log(payment.paymentUrl);
@@ -98,7 +99,7 @@ console.log(payment.paymentUrl);
   "qrImageUrl": "https://dscloud.vercel.app/file/jCpCbvd8",
   "DirectUrl": "https://dscloud.vercel.app/f/jCpCbvd8.png",
   "DLQRImageUrl": "https://dscloud.vercel.app/file/jCpCbvd8?dl",
-  "paymentUrl": "https://your-domain.example/pay?ds=ENCODED_PAYMENT_DATA",
+  "paymentUrl": "https://ds-upi-qr-generator.vercel.app/pay?ds=ENCODED_PAYMENT_DATA",
   "upiId": "sanchit@ybl",
   "name": "Sanchit",
   "amount": "250"
@@ -150,7 +151,7 @@ For production use, configure a custom domain or route in the Cloudflare Worker 
 
 ## External Service
 
-QR images are generated and hosted through the [Ghost APIs hostqr endpoint](https://ghostapis.vercel.app/qr/hostqr). The Worker does not store payment data, but QR requests are sent to this external service.
+QR images are generated and hosted through the [Ghost APIs hostqr Endpoint](https://ghostapis.vercel.app/qr/hostqr). The Worker does not store payment data, but QR requests are sent to this external service.
 
 ## Limitations and Security
 
