@@ -546,9 +546,35 @@ async function generateQR(request) {
     upiParams.set('am', amount);
   }
   const upiLink = `upi://pay?${upiParams.toString()}`;
-  const qrDataUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiLink)}&size=200x200`;
+  const qrDataUrl = `https://ghostapis.vercel.app/qr/genqr?data=${encodeURIComponent(upiLink)}&size=200`;
 
   return { qrImageUrl: qrDataUrl, upiId: upiId, upiLink: upiLink, amount: amount, name: name };
+}
+
+async function generateHostedQR(request) {
+  const qr = await generateQR(request);
+  const hostQRUrl = `https://ghostapis.vercel.app/qr/hostqr?data=${encodeURIComponent(qr.upiLink)}&size=200`;
+  const response = await fetch(hostQRUrl);
+
+  if (!response.ok) {
+    throw new Error(`QR hosting service returned HTTP ${response.status}`);
+  }
+
+  const hostedQR = await response.json();
+  if (!hostedQR.success || !hostedQR.url || !hostedQR.directlink || !hostedQR.downloadlink) {
+    throw new Error('QR hosting service returned an incomplete response');
+  }
+
+  return {
+    success: hostedQR.success,
+    qrImageUrl: hostedQR.url,
+    directUrl: hostedQR.directlink,
+    downloadUrl: hostedQR.downloadlink,
+    upiId: qr.upiId,
+    // upiLink: qr.upiLink,
+    amount: qr.amount,
+    name: qr.name
+  };
 }
 
 function jsonResponse(body, status = 200, extraHeaders) {
@@ -578,15 +604,18 @@ async function apiQR(request) {
     return jsonResponse({ error: 'Query parameters pa and a positive am are required. pn is optional.' }, 400);
   }
 
-  const qr = await generateQR(request);
+  const qr = await generateHostedQR(request);
   const paymentUrl = new URL('/pay', request.url);
   if (paymentUrl.hostname === 'localhost') {
     paymentUrl.port = '8787';
   }
   paymentUrl.searchParams.set('ds', encodePaymentData(upiId, name, amount));
   return jsonResponse({
+    Success: qr.success,
     qrImageUrl: qr.qrImageUrl,
-    upiLink: qr.upiLink,
+    DirectUrl: qr.directUrl,  
+    DLQRImageUrl: qr.downloadUrl,
+    // upiLink: qr.upiLink,
     paymentUrl: paymentUrl.toString(),
     upiId,
     name,

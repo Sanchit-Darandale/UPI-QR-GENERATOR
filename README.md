@@ -94,8 +94,10 @@ console.log(payment.paymentUrl);
 
 ```json
 {
-  "qrImageUrl": "https://api.qrserver.com/v1/create-qr-code/?data=...&size=200x200",
-  "upiLink": "upi://pay?pa=sanchit%40ybl&pn=Sanchit&cu=INR&am=250",
+  "Success": true,
+  "qrImageUrl": "https://dscloud.vercel.app/file/jCpCbvd8",
+  "DirectUrl": "https://dscloud.vercel.app/f/jCpCbvd8.png",
+  "DLQRImageUrl": "https://dscloud.vercel.app/file/jCpCbvd8?dl",
   "paymentUrl": "https://your-domain.example/pay?ds=ENCODED_PAYMENT_DATA",
   "upiId": "sanchit@ybl",
   "name": "Sanchit",
@@ -148,7 +150,7 @@ For production use, configure a custom domain or route in the Cloudflare Worker 
 
 ## External Service
 
-QR images are generated through [QRServer](https://goqr.me/api/). The Worker does not store payment data, but QR image requests are sent to this external service.
+QR images are generated and hosted through the [Ghost APIs hostqr endpoint](https://ghostapis.vercel.app/qr/hostqr). The Worker does not store payment data, but QR requests are sent to this external service.
 
 ## Limitations and Security
 
@@ -156,7 +158,7 @@ QR images are generated through [QRServer](https://goqr.me/api/). The Worker doe
 - Always confirm successful payment in your UPI app or bank account.
 - Validate payment details before sharing a link.
 - The `ds` value is reversible obfuscation, not encryption.
-- The QR image depends on the availability of QRServer.
+- The QR image depends on the availability of Ghost APIs and DSCloud.
 
 ## License
 
